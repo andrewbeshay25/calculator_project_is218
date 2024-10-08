@@ -1,3 +1,7 @@
+from typing import Union
+
+Number = Union[int, float]
+
 # addition function 
 def addition(a,b):
     return a + b
@@ -10,3 +14,4 @@ def multiplication(a,b):
 
 def division(a,b):
     return a / b
+

@@ -1,48 +1,75 @@
-# from pathlib import Path
+import os
+import logging
+from typing import Any
 
-# class DirectoryManager:
-#     """
-#     Singleton class responsible for managing directory creation and validation.
+# Set up logging configuration
+def setup_logging(level: int = logging.INFO) -> None:
+    """Sets up logging configuration.
     
-#     Attributes:
-#         directory (Path): Path object representing the directory.
-#     """
-    
-#     _instances = {}
+    Args:
+        level (int): The logging level to use (default: logging.INFO).
+    """
+    logging.basicConfig(level=level, format='%(asctime)s - %(levelname)s - %(message)s')
 
-#     def __new__(cls, directory):
-#         if cls not in cls._instances:
-#             cls._instances[cls] = super(DirectoryManager, cls).__new__(cls)
-#         return cls._instances[cls]
-
-#     def __init__(self, directory):
-#         """
-#         Initializes DirectoryManager and ensures the directory exists.
-
-#         Args:
-#             directory (str or Path): The directory to manage.
-#         """
-#         self.directory = Path(directory)
-#         self.ensure_directory_exists()
-
-#     def ensure_directory_exists(self):
-#         """
-#         Ensures the specified directory exists, creating it if necessary.
+class FileManager:
+    def __init__(self, filename: str) -> None:
+        """Initialize FileManager with a specified filename.
         
-#         Raises:
-#             Exception: If the directory cannot be created.
-#         """
-#         if not self.directory.exists():
-#             try:
-#                 self.directory.mkdir(parents=True)
-#             except Exception as e:
-#                 raise Exception(f"Error creating directory {self.directory}: {e}")
+        Args:
+            filename (str): The name of the file to manage.
+        """
+        self.filename = filename
 
-#     def get_directory(self):
-#         """
-#         Returns the directory managed by this instance.
+    def write_file(self, data: str) -> None:
+        """Write data to a file.
+        
+        Args:
+            data (str): The data to write to the file.
+        
+        Raises:
+            IOError: If an I/O error occurs during writing.
+        """
+        try:
+            with open(self.filename, 'w') as file:
+                file.write(data)
+            logging.info(f"Successfully wrote to file: {self.filename}")
+        except IOError as e:
+            logging.error(f"Failed to write to file '{self.filename}'. Error: {e}")
+            raise
 
-#         Returns:
-#             Path: The path of the managed directory.
-#         """
-#         return self.directory
+    def read_file(self) -> str:
+        """Read data from a file.
+        
+        Returns:
+            str: The content of the file.
+        
+        Raises:
+            FileNotFoundError: If the file does not exist.
+            IOError: If an I/O error occurs during reading.
+        """
+        try:
+            with open(self.filename, 'r') as file:
+                content = file.read()
+            logging.info(f"Successfully read from file: {self.filename}")
+            return content
+        except FileNotFoundError:
+            logging.error(f"File not found: {self.filename}")
+            raise
+        except IOError as e:
+            logging.error(f"Failed to read from file '{self.filename}'. Error: {e}")
+            raise
+
+    def delete_file(self) -> None:
+        """Delete the file, if it exists.
+        
+        Raises:
+            OSError: If an error occurs during deletion.
+        """
+        try:
+            os.remove(self.filename)
+            logging.info(f"Successfully deleted file: {self.filename}")
+        except FileNotFoundError:
+            logging.warning(f"File not found for deletion: {self.filename}")
+        except OSError as e:
+            logging.error(f"Failed to delete file '{self.filename}'. Error: {e}")
+            raise
